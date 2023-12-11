@@ -1,4 +1,4 @@
-const loadPhone = async (searchText, isShowAll) => {
+const loadPhone = async (searchText = '13', isShowAll) => {
     const res = await fetch(`https://openapi.programming-hero.com/api/phones?search=${searchText}`);
     const data = await res.json();
     const phones = data.data;
@@ -7,8 +7,8 @@ const loadPhone = async (searchText, isShowAll) => {
 };
 
 
-const displayPhones = (phones,isShowAll) => {
-    console.log(phones);
+const displayPhones = (phones, isShowAll) => {
+    // console.log(phones);
     // step:1
     const phoneContainer = document.getElementById('phone-container');
     // clear phone container cards before adding new cards using ( .innerHTML or .textContent)
@@ -22,9 +22,9 @@ const displayPhones = (phones,isShowAll) => {
         showAllContainer.classList.add('hidden');
     }
 
-    console.log('is show all', isShowAll)
+    // console.log('is show all', isShowAll)
     // display only first 12 phones if not show all
-    if(!isShowAll){
+    if (!isShowAll) {
         phones = phones.slice(0, 12);
     }
 
@@ -40,8 +40,8 @@ const displayPhones = (phones,isShowAll) => {
     <div class="card-body">
     <h2 class="card-title">${phone.phone_name}</h2>
     <p>If a dog chews shoes whose shoes does he choose?</p>
-    <div class="card-actions justify-end">
-    <button class="btn btn-primary">Buy Now</button>
+    <div class="card-actions justify-center">
+    <button onclick="handleShowDetails('${phone.slug}')" class="btn btn-primary ">Show Details</button>
      </div>
     </div>
     `;
@@ -52,6 +52,39 @@ const displayPhones = (phones,isShowAll) => {
     // hide loading spinner 
     toggleLoadingSpinner(false);
 };
+// 
+const handleShowDetails = async (id) => {
+    // console.log('click show details', id)
+    // load single phone data
+    const res = await fetch(`https://openapi.programming-hero.com/api/phone/${id}`);
+    const data = await res.json();
+    const phone = data.data;
+
+    showPhoneDetails(phone)
+}
+
+const showPhoneDetails = (phone) => {
+    console.log(phone);
+    const phoneName = document.getElementById('show-details-phone-name');
+    phoneName.innerText = phone.name;
+
+    const showDetailsContainer = document.getElementById('show-detail-container');
+
+    showDetailsContainer.innerHTML = `
+    <img src="${phone.image}" alt=""/>
+    <p> <span>Storage: </span>${phone?.mainFeatures?.storage}</p>
+    <p> <span>Display Size: </span>${phone?.mainFeatures?.displaySize}</p>
+    <p> <span>ChipSet: </span>${phone?.mainFeatures?.chipSet}</p>
+    <p> <span>Memory: </span>${phone?.mainFeatures?.memory}</p>
+    <p> <span>Slug:</span>${phone?.slug}</p>
+    <p> <span>Release Date: </span>${phone?.releaseDate}</p>
+    <p> <span>Brand: </span>${phone?.brand}</p>
+    <p> <span>GPS: </span>${phone?.others?.GPS || 'No GPS available In this device'}</p>
+    `;
+
+    // show the modal
+    show_details_modal.showModal();
+}
 
 // handle search button
 const handleSearch = (isShowAll) => {
@@ -59,7 +92,7 @@ const handleSearch = (isShowAll) => {
     const searchField = document.getElementById('search-field');
     const searchText = searchField.value;
     // console.log(searchText);
-    loadPhone(searchText,isShowAll);
+    loadPhone(searchText, isShowAll);
 };
 
 // handle search button recap
@@ -84,4 +117,4 @@ const handleShowAll = () => {
     handleSearch(true);
 }
 
-// loadPhone();
+loadPhone();
